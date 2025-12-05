@@ -46,6 +46,10 @@ const Footer = () => {
               <li><a href="#" className="hover:text-white transition-colors">Система тикетов</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Живой чат</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Контакты</a></li>
+              <li><a href="/admin" className="hover:text-white transition-colors flex items-center gap-1">
+                <Icon name="ShieldCheck" size={14} />
+                Админ-панель
+              </a></li>
             </ul>
           </div>
         </div>
