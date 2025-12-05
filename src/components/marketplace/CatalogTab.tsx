@@ -21,9 +21,10 @@ interface CatalogTabProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   products: Product[];
+  onAddToCart?: (product: Product) => void;
 }
 
-const CatalogTab = ({ searchQuery, setSearchQuery, products }: CatalogTabProps) => {
+const CatalogTab = ({ searchQuery, setSearchQuery, products, onAddToCart }: CatalogTabProps) => {
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     product.vendor.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -108,7 +109,10 @@ const CatalogTab = ({ searchQuery, setSearchQuery, products }: CatalogTabProps) 
                   {product.price.toLocaleString('ru-RU')} ₽
                 </p>
               </div>
-              <Button className="w-full bg-primary hover:bg-primary/90">
+              <Button 
+                className="w-full bg-primary hover:bg-primary/90"
+                onClick={() => onAddToCart?.(product)}
+              >
                 <Icon name="ShoppingCart" size={18} className="mr-2" />
                 В корзину
               </Button>

@@ -6,6 +6,9 @@ import Footer from '@/components/marketplace/Footer';
 import MarketplaceHero from '@/components/marketplace/MarketplaceHero';
 import CatalogTab from '@/components/marketplace/CatalogTab';
 import VendorPanel from '@/components/marketplace/VendorPanel';
+import ShoppingCart from '@/components/marketplace/ShoppingCart';
+import SupportTickets from '@/components/marketplace/SupportTickets';
+import UserProfile from '@/components/marketplace/UserProfile';
 
 interface Product {
   id: number;
@@ -26,10 +29,22 @@ interface ShippingZone {
   maxDistance: number;
 }
 
+interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  vendor: string;
+  image: string;
+  quantity: number;
+  weight: number;
+}
+
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('marketplace');
   const [vendorInn, setVendorInn] = useState('');
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [shippingZones] = useState<ShippingZone[]>([
     { id: 1, name: 'Москва и МО', baseRate: 300, perKgRate: 50, maxDistance: 50 },
     { id: 2, name: 'Центральная Россия', baseRate: 500, perKgRate: 80, maxDistance: 500 },
@@ -107,13 +122,45 @@ const Index = () => {
     }
   };
 
+  const handleAddToCart = (product: Product) => {
+    const existingItem = cartItems.find(item => item.id === product.id);
+    if (existingItem) {
+      setCartItems(cartItems.map(item =>
+        item.id === product.id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      ));
+    } else {
+      setCartItems([...cartItems, {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        vendor: product.vendor,
+        image: product.image,
+        quantity: 1,
+        weight: 0.5,
+      }]);
+    }
+    setIsCartOpen(true);
+  };
+
+  const handleUpdateQuantity = (id: number, quantity: number) => {
+    setCartItems(cartItems.map(item =>
+      item.id === id ? { ...item, quantity } : item
+    ));
+  };
+
+  const handleRemoveItem = (id: number) => {
+    setCartItems(cartItems.filter(item => item.id !== id));
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      <Header activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Header activeTab={activeTab} setActiveTab={setActiveTab} cartCount={cartItems.length} onCartClick={() => setIsCartOpen(true)} />
 
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
             <TabsTrigger value="marketplace" className="text-base">
               <Icon name="ShoppingBag" size={20} className="mr-2" />
               Маркетплейс
@@ -126,6 +173,14 @@ const Index = () => {
               <Icon name="Briefcase" size={20} className="mr-2" />
               Панель продавца
             </TabsTrigger>
+            <TabsTrigger value="profile" className="text-base">
+              <Icon name="User" size={20} className="mr-2" />
+              Личный кабинет
+            </TabsTrigger>
+            <TabsTrigger value="support" className="text-base">
+              <Icon name="MessageSquare" size={20} className="mr-2" />
+              Поддержка
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="marketplace">
@@ -137,6 +192,7 @@ const Index = () => {
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
               products={products}
+              onAddToCart={handleAddToCart}
             />
           </TabsContent>
 
@@ -148,7 +204,23 @@ const Index = () => {
               verifyInn={verifyInn}
             />
           </TabsContent>
+
+          <TabsContent value="profile">
+            <UserProfile />
+          </TabsContent>
+
+          <TabsContent value="support">
+            <SupportTickets />
+          </TabsContent>
         </Tabs>
+
+        <ShoppingCart
+          isOpen={isCartOpen}
+          onClose={() => setIsCartOpen(false)}
+          cartItems={cartItems}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveItem={handleRemoveItem}
+        />
       </main>
 
       <Footer />

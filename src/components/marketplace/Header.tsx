@@ -1,12 +1,15 @@
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 
 interface HeaderProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  cartCount?: number;
+  onCartClick?: () => void;
 }
 
-const Header = ({ activeTab, setActiveTab }: HeaderProps) => {
+const Header = ({ activeTab, setActiveTab, cartCount = 0, onCartClick }: HeaderProps) => {
   return (
     <header className="sticky top-0 z-50 bg-white border-b shadow-sm">
       <div className="container mx-auto px-4 py-4">
@@ -34,20 +37,25 @@ const Header = ({ activeTab, setActiveTab }: HeaderProps) => {
               <Icon name="Store" size={18} className="mr-2" />
               Для продавцов
             </Button>
-            <Button variant="ghost">
+            <Button variant="ghost" onClick={() => setActiveTab('support')}>
               <Icon name="HeadphonesIcon" size={18} className="mr-2" />
               Поддержка
             </Button>
           </nav>
 
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => setActiveTab('profile')}>
               <Icon name="User" size={18} className="mr-2" />
-              Войти
+              Профиль
             </Button>
-            <Button size="sm" className="bg-primary hover:bg-primary/90">
+            <Button size="sm" className="bg-primary hover:bg-primary/90 relative" onClick={onCartClick}>
               <Icon name="ShoppingCart" size={18} className="mr-2" />
               Корзина
+              {cartCount > 0 && (
+                <Badge className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 min-w-[20px] h-5 flex items-center justify-center p-1">
+                  {cartCount}
+                </Badge>
+              )}
             </Button>
           </div>
         </div>
